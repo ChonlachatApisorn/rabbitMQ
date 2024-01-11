@@ -19,7 +19,12 @@ amqp.connect('amqp://guest:guest@rabbitmq:5672', (err, conn) => {
         const responseQueue = 'response-queue';
         ch.assertQueue(responseQueue, { durable: false });
 
-        const newMsg = 'test';
+        const newMsg = {
+            userId: 't01',
+            name: 'test'
+        };
+
+        const jsonStr = JSON.stringify(newMsg)
 
         ch.consume(responseQueue, function (response) {
             // Check if the response is an error message
@@ -33,10 +38,10 @@ amqp.connect('amqp://guest:guest@rabbitmq:5672', (err, conn) => {
             process.exit(0);
         }, { noAck: true });
 
-        const success = ch.sendToQueue(queue, Buffer.from(newMsg));
+        const success = ch.sendToQueue(queue, Buffer.from(jsonStr));
 
         if (success) {
-            console.log(` [x] Sent '${newMsg}'`);
+            console.log(` [x] Sent '${jsonStr}'`);
         } else {
             console.error(` [!] Failed to send message '${newMsg}'`);
             conn.close();

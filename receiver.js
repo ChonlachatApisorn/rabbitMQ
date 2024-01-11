@@ -21,10 +21,12 @@ amqp.connect('amqp://guest:guest@rabbitmq:5672', (err, conn) => {
 
         console.log(" [x] Waiting for messages in %s.", queue);
         ch.consume(queue, function (msg) {
+            const jsonPar = JSON.parse(msg.content)
             console.log(" [x] Received %s", msg.content.toString());
 
             setTimeout(() => {
-                if (msg.content.toString() === 'error') {
+                // simulate check condition
+                if (jsonPar.userId === 't01') {
                     const errorMsg = 'Error: Something went wrong';
                     ch.sendToQueue(responseQueue, Buffer.from(errorMsg));
                     console.log(` [!] Sent error response: ${errorMsg}`);
